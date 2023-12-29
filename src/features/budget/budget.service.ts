@@ -6,8 +6,20 @@ import { BudgetItem } from './budget.interfaces';
 @Service()
 export class BudgetService extends Repository<BudgetItemEntity> {
   public async createBudgetItem(budgetItemData: BudgetItem) {
-    const createBudgetItemData = await BudgetItemEntity.create({ ...budgetItemData }).save();
+    const budgetItem = await BudgetItemEntity.create({
+      ...budgetItemData,
+    }).save();
 
-    return createBudgetItemData;
+    return budgetItem;
+  }
+
+  public async fetchBudgetItems() {
+    const budgetItems = await BudgetItemEntity.find({ relations: ['user'] });
+
+    return budgetItems;
+  }
+
+  public async deleteBudgetItem(budgetItemId: number) {
+    await BudgetItemEntity.delete(budgetItemId);
   }
 }

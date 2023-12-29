@@ -5,9 +5,9 @@ import { UserEntity } from '@/features/auth/auth.entity';
 import { HttpException } from '@/core/exceptions/http-exception';
 import { DataStoredInToken, RequestWithUser } from './auth.types';
 
-const getAuthorization = (request: RequestWithUser) => {
-  const coockie = request.cookies['Authorization'];
-  if (coockie) return coockie;
+const getAuthorization = (request: RequestWithUser): string | null => {
+  const cookie = request.cookies['Authorization'];
+  if (cookie) return cookie;
 
   const header = request.header('Authorization');
   if (header) return header.split('Bearer ')[1];
@@ -15,13 +15,20 @@ const getAuthorization = (request: RequestWithUser) => {
   return null;
 };
 
-export const AuthMiddleware = async (request: RequestWithUser, response: Response, next: NextFunction) => {
+export const AuthMiddleware = async (
+  request: RequestWithUser,
+  _response: Response,
+  next: NextFunction,
+) => {
   try {
-    const Authorization = getAuthorization(request);
+    const authorization = getAuthorization(request);
 
-    if (Authorization) {
-      const { id } = (await verify(Authorization, SECRET_KEY)) as DataStoredInToken;
-      const findUser = await UserEntity.findOne({ where: { id }, select: ['id', 'username', 'email'] });
+    if (authorization) {
+      const { id } = verify(authorization, SECRET_KEY) as DataStoredInToken;
+      const findUser = await UserEntity.findOne({
+        where: { id },
+        select: ['id', 'username', 'email'],
+      });
 
       if (findUser) {
         request.user = findUser;

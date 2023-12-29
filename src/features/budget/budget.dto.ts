@@ -1,14 +1,20 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsObject, IsString } from 'class-validator';
 
-export class CreateBudgetItemDto {
+export class BudgetItemDto {
   @IsString()
   @IsNotEmpty()
   public title: string;
 
   @IsNotEmpty()
-  public value: string;
+  public value: number;
 
   @IsString()
   @IsNotEmpty()
   public category: string;
+}
+
+export class CreateBudgetItemDto {
+  @IsObject()
+  @IsNotEmpty()
+  public item: BudgetItemDto;
 }

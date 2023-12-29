@@ -12,7 +12,10 @@ const createToken = (user: Omit<User, 'password'>): TokenData => {
   const secretKey = SECRET_KEY;
   const expiresIn = 60 * 60;
 
-  return { expiresIn, token: sign(dataStoredInToken, secretKey, { expiresIn }) };
+  return {
+    expiresIn,
+    token: sign(dataStoredInToken, secretKey, { expiresIn }),
+  };
 };
 
 const createCookie = (tokenData: TokenData) => {
@@ -22,26 +25,36 @@ const createCookie = (tokenData: TokenData) => {
 @Service()
 export class AuthService extends Repository<UserEntity> {
   public async signup(userData: User) {
-    const findUser = await UserEntity.findOne({ where: { email: userData.email } });
+    const findUser = await UserEntity.findOne({
+      where: { email: userData.email },
+    });
 
     if (findUser) {
       throw new HttpException(409, 'email or username is already taken.');
     }
 
     const hashedPassword = await hash(userData.password, 10);
-    const createUserData = await UserEntity.create({ ...userData, password: hashedPassword }).save();
+    const createUserData = await UserEntity.create({
+      ...userData,
+      password: hashedPassword,
+    }).save();
 
     return createUserData;
   }
 
   public async signin(signinData: SigninData): Promise<SigninResponse> {
-    const user = await UserEntity.findOne({ where: { username: signinData.username } });
+    const user = await UserEntity.findOne({
+      where: { username: signinData.username },
+    });
 
     if (!user) {
       throw new HttpException(409, 'user not found.');
     }
 
-    const isPasswordMatching = await compare(signinData.password, user.password);
+    const isPasswordMatching = await compare(
+      signinData.password,
+      user.password,
+    );
 
     if (!isPasswordMatching) {
       throw new HttpException(409, 'password is incorrect.');

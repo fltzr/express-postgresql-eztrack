@@ -1,6 +1,15 @@
 import { IsDateString, IsNotEmpty } from 'class-validator';
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { User } from './auth.types';
+import {
+  BaseEntity,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Unique,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { type User } from './auth.types';
 import { BudgetItemEntity } from '../budget/budget.entity';
 
 @Entity()

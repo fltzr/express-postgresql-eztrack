@@ -21,17 +21,13 @@
     "baseUrl": "src",
     "paths": {
       "@/*": ["*"],
-      "@config": ["config"],
-      "@controllers/*": ["controllers/*"],
-      "@database": ["database"],
-      "@dtos/*": ["dtos/*"],
-      "@entities/*": ["entities/*"],
-      "@exceptions/*": ["exceptions/*"],
-      "@interfaces/*": ["interfaces/*"],
-      "@middlewares/*": ["middlewares/*"],
-      "@routes/*": ["routes/*"],
-      "@services/*": ["services/*"],
-      "@utils/*": ["utils/*"]
+      "@/config": ["core/config"],
+      "@/database": ["core/database"],
+      "@/exceptions/*": ["core/exceptions/*"],
+      "@/interfaces/*": ["core/interfaces/*"],
+      "@/middlewares/*": ["core/middlewares/*"],
+      "@/utils/*": ["core/utils/*"],
+      "@/features/*": ["features/*"]
     }
   },
   "module": {

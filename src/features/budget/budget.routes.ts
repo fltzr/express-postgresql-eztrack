@@ -6,7 +6,7 @@ import { CreateBudgetItemDto } from './budget.dto';
 import { BudgetItemController } from './budget.controller';
 
 export class BudgetRoute implements Routes {
-  public path = '/budget';
+  public path = '/bank';
   public router = Router();
   public budget = new BudgetItemController();
 
@@ -15,6 +15,22 @@ export class BudgetRoute implements Routes {
   }
 
   private initializeRoutes = () => {
-    this.router.post(`${this.path}/budget-item/create`, AuthMiddleware, ValidationMiddleware(CreateBudgetItemDto), this.budget.createBudgetItem);
+    this.router
+      .get(
+        `${this.path}/budget-item/fetch`,
+        AuthMiddleware,
+        this.budget.fetchBudgetItems,
+      )
+      .post(
+        `${this.path}/budget-item/create`,
+        AuthMiddleware,
+        ValidationMiddleware(CreateBudgetItemDto),
+        this.budget.createBudgetItem,
+      )
+      .delete(
+        `${this.path}/budget-item/delete/:id`,
+        AuthMiddleware,
+        this.budget.deleteBudgetItem,
+      );
   };
 }
