@@ -54,7 +54,7 @@ export class App {
 `);
       })
       .catch(() => {
-        logger.info(`
+        logger.error(`
 ┌──────────────────────────────────┐
 │ [X] Error connecting to postgres │
 └──────────────────────────────────┘
