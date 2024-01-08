@@ -1,25 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
 import Container from 'typedi';
 import { AuthService } from './auth.service';
-import { RequestWithUser, SigninData, User } from './auth.types';
+import { RequestWithUser, SigninData } from './auth.types';
 
 export class AuthController {
   public auth = Container.get(AuthService);
+
+  public authn = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+  ) => {};
+
+  public authncb = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+  ) => {};
 
   public signup = async (
     request: Request,
     response: Response,
     next: NextFunction,
-  ) => {
-    try {
-      const userData = request.body as User;
-      const signupResponse = await this.auth.signup(userData);
-
-      response.status(200).json({ data: signupResponse, message: 'signup' });
-    } catch (error) {
-      next(error);
-    }
-  };
+  ) => {};
 
   public signin = async (
     request: Request,

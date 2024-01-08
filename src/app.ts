@@ -5,21 +5,39 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
-import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@/core/config';
+import {
+  NODE_ENV,
+  PORT,
+  LOG_FORMAT,
+  ORIGIN,
+  CREDENTIALS,
+  SECRET_KEY,
+  OIDC_ISSUER,
+  OIDC_CLIENT_ID,
+  OIDC_CLIENT_SECRET,
+  OIDC_REDIRECT_URI,
+  OIDC_RESPONSE_TYPE,
+} from '@/core/config';
 import { AppDataSource } from '@/core/database';
 import { Routes } from '@/core/interfaces/routes.interface';
 import { ErrorMiddleware } from '@/core/middlewares/error.middleware';
 import { logger, stream } from '@/core/utils/logger';
+import session from 'express-session';
+import { Issuer } from 'openid-client';
+import { OpenIDClientManager } from './core/utils/openid-client-manager';
 
 export class App {
-  public app: express.Application;
   public env: string;
   public port: string | number;
 
+  public app: express.Application;
+  public oidc: OpenIDClientManager;
+
   constructor(routes: Routes[]) {
-    this.app = express();
-    this.env = NODE_ENV || 'development';
     this.port = PORT || 3000;
+    this.env = NODE_ENV || 'development';
+    this.app = express();
+    this.oidc = new OpenIDClientManager();
 
     this.connectToDatabase();
     this.initializeMiddlewares();
@@ -27,7 +45,7 @@ export class App {
     this.initializeErrorHandling();
   }
 
-  public listen() {
+  public listen = () => {
     this.app.listen(this.port, () => {
       logger.info(`
 ┌──────────────────────────────────┐
@@ -38,13 +56,13 @@ export class App {
 └──────────────────────────────────┘
 `);
     });
-  }
+  };
 
-  public getServer() {
+  public getServer = () => {
     return this.app;
-  }
+  };
 
-  private async connectToDatabase() {
+  private connectToDatabase = async () => {
     await AppDataSource.initialize()
       .then(() => {
         logger.info(`
@@ -60,9 +78,9 @@ export class App {
 └──────────────────────────────────┘
 `);
       });
-  }
+  };
 
-  private initializeMiddlewares() {
+  private initializeMiddlewares = () => {
     this.app.use(morgan(LOG_FORMAT, { stream }));
     this.app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS }));
     this.app.use(helmet());
@@ -70,15 +88,28 @@ export class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
-  }
 
-  private initializeRoutes(routes: Routes[]) {
+    this.app.use(
+      session({
+        secret: SECRET_KEY,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+          secure: true,
+          httpOnly: true,
+          maxAge: 1000 * 60 * 60, // 1 hour,
+        },
+      }),
+    );
+  };
+
+  private initializeRoutes = (routes: Routes[]) => {
     routes.forEach(route => {
       this.app.use('/', route.router);
     });
-  }
+  };
 
-  private initializeErrorHandling() {
+  private initializeErrorHandling = () => {
     this.app.use(ErrorMiddleware);
-  }
+  };
 }
